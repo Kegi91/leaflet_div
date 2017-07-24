@@ -20,12 +20,13 @@ def read_gro_line(f_in):
 
     return res_name, res_num, a_name, z
 
-def print_leaflet(fname, center, res_name, atom_name):
+def print_leaflet(fname, res_name, atom_name):
     f = open(fname, 'r')
     skip_lines(f,2)
 
     upper = []
     lower = []
+    center = find_center(fname, res_name, atom_name)
 
     while True:
         try:
@@ -33,7 +34,7 @@ def print_leaflet(fname, center, res_name, atom_name):
         except ValueError:
             break
 
-        if res.find(res_name) != -1 and atom.find(atom_name) != -1:
+        if res == res_name and atom == atom_name:
             if z < center:
                 lower.append(res_num)
             else:
@@ -41,10 +42,12 @@ def print_leaflet(fname, center, res_name, atom_name):
 
     f.close()
 
-    print("\nUpper:\t%d-%d"%(upper[0],upper[-1]))
+    print("\nUpper leaflet (%d residues):\n"%(len(upper)))
     print_consecutive_elems(upper)
-    print("\nLower:\t%d-%d"%(lower[0],lower[-1]))
+    print("\nLower leaflet (%d residues):\n"%(len(lower)))
     print_consecutive_elems(lower)
+
+    print("\nCenter at z = %.3f\n"%(center))
 
 def find_center(fname, res_name, atom_name):
     f = open(fname, 'r')
@@ -59,12 +62,17 @@ def find_center(fname, res_name, atom_name):
         except ValueError:
             break
 
-        if res.find(res_name) != -1 and atom.find(atom_name) != -1:
+        if res == res_name and atom == atom_name:
             z_sum += z
             z_numb += 1
 
     f.close()
-    return z_sum/z_numb
+
+    try:
+        return z_sum/z_numb
+    except ZeroDivisionError:
+        print("\nNo matches found. Check res_name and atom_name.\n")
+        raise
 
 def print_consecutive_elems(array):
     prev = array[0]
@@ -81,9 +89,9 @@ def print_consecutive_elems(array):
 
     print("%d-%d\n"%(low, array[i]))
 
-print_leaflet(
-    "input/system_solv.gro",
-    find_center("input/system_solv.gro", "DPPC", "P"),
-    "DPPC",
-    "P"
-)
+if __name__ == "__main__":
+    print_leaflet(
+        "input/system_solv.gro",
+        "DPPC",
+        "P8"
+    )
