@@ -91,7 +91,7 @@ def print_consecutive_elems(array):
 
 if __name__ == "__main__":
     print_leaflet(
-        "input/system_solv.gro",
-        "DPPC",
-        "P8"
+        "input/system.gro",
+        "POPC",
+        "P"
     )
