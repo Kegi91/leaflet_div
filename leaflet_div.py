@@ -1,4 +1,63 @@
+#!/usr/bin/env python3
+
 import numpy as np
+from optparse import OptionParser
+
+def optP():
+    """Parse command line options.
+
+    """
+
+
+    usage="[python3] %prog -i mol.gro -r POPC -a P"
+
+    description="Membrane leaflet divider"
+    version="\n%prog Version 1 \n\nRequires Python 3, numpy" \
+
+
+    optParser = OptionParser(usage=usage,
+                             version=version,
+                             description=description)
+
+    optParser.set_defaults(molFN=None, resNA=None,
+                           atomNA=None)
+
+    optParser.add_option('-i', type='str',
+                         dest='molFN',
+                         help="Input 3D structure (pdb/gro)"
+                         " [default: %default]")
+
+
+    optParser.add_option('-r', type='str',
+                         dest='resNA',
+                         help="Residue membrane component (e.g. POPC)"
+                         " [default: %default] ")
+
+
+    optParser.add_option('-a', type='str',
+                         dest='atomNA',
+                         help="Atom name for distance calculation (e.g. P)"
+                         " [default: %default]")
+
+    options, args = optParser.parse_args()
+
+    if options.molFN is None:
+        s = "Error: 3D structure (pdb/gro) is required."
+        print(s)
+        sys.exit(2)
+
+    elif options.resNA is None:
+        s = "Error: Reference residue name is required."
+        print(s)
+        sys.exit(2)
+
+    elif options.atomNA is None:
+        s = "Error: Atom name is required."
+        print(s)
+        sys.exit(2)
+
+    return options, args
+
 
 def skip_lines(f, i):
     for i in range(i):
@@ -90,8 +149,10 @@ def print_consecutive_elems(array):
     print("%d-%d\n"%(low, array[i]))
 
 if __name__ == "__main__":
+    options, args = optP()
+
     print_leaflet(
-        "input/system.gro",
-        "POPC",
-        "P"
+        options.molFN,
+        options.resNA,
+        options.atomNA
     )
