@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import numpy as np
 from optparse import OptionParser
 
 def optP():
@@ -12,7 +11,7 @@ def optP():
     usage="[python3] %prog -i mol.gro -r POPC -a P"
 
     description="Membrane leaflet divider"
-    version="\n%prog Version 1 \n\nRequires Python 3, numpy" \
+    version="\n%prog Version 1 \n\nRequires Python 3" \
 
 
     optParser = OptionParser(usage=usage,
