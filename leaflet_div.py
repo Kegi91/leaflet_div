@@ -1,62 +1,59 @@
 #!/usr/bin/env python3
 
 from optparse import OptionParser
+import numpy as np
 
 def optP():
     """Parse command line options.
-
     """
 
-
     usage="[python3] %prog -i mol.gro -r POPC -a P"
-
     description="Membrane leaflet divider"
-    version="\n%prog Version 1 \n\nRequires Python 3" \
+    version="\n%prog Version 1.0 \n\nRequires Python 3 and Numpy\n" \
+
+    optParser = OptionParser(
+                        usage=usage,
+                        version=version,
+                        description=description
+    )
+
+    optParser.set_defaults(molFN=None, resNA=None, atomNA=None)
+
+    optParser.add_option(
+                    '-i', type='str',
+                     dest='molFN',
+                     help="Input 3D structure (gro)"
+                     " [default: %default]"
+    )
+
+    optParser.add_option(
+                    '-r', type='str',
+                     dest='resNA',
+                     help="Residue membrane component (e.g. POPC)"
+                     " [default: %default] "
+    )
 
 
-    optParser = OptionParser(usage=usage,
-                             version=version,
-                             description=description)
-
-    optParser.set_defaults(molFN=None, resNA=None,
-                           atomNA=None)
-
-    optParser.add_option('-i', type='str',
-                         dest='molFN',
-                         help="Input 3D structure (pdb/gro)"
-                         " [default: %default]")
-
-
-    optParser.add_option('-r', type='str',
-                         dest='resNA',
-                         help="Residue membrane component (e.g. POPC)"
-                         " [default: %default] ")
-
-
-    optParser.add_option('-a', type='str',
-                         dest='atomNA',
-                         help="Atom name for distance calculation (e.g. P)"
-                         " [default: %default]")
+    optParser.add_option(
+                    '-a', type='str',
+                     dest='atomNA',
+                     help="Atom name for distance calculation (e.g. P)"
+                     " [default: %default]"
+    )
 
     options, args = optParser.parse_args()
 
-    if options.molFN is None:
-        s = "Error: 3D structure (pdb/gro) is required."
-        print(s)
-        sys.exit(2)
-
-    elif options.resNA is None:
-        s = "Error: Reference residue name is required."
-        print(s)
-        sys.exit(2)
-
-    elif options.atomNA is None:
-        s = "Error: Atom name is required."
-        print(s)
-        sys.exit(2)
+    if options.molFN == None:
+        print("Error: 3D structure (gro) is required.\n")
+        sys.exit(1)
+    elif options.resNA == None:
+        print("Error: Reference residue name is required.\n")
+        sys.exit(1)
+    elif options.atomNA == None:
+        print("Error: Atom name is required.\n")
+        sys.exit(1)
 
     return options, args
-
 
 def skip_lines(f, i):
     for i in range(i):
@@ -82,8 +79,8 @@ def print_leaflet(fname, res_name, atom_name):
     f = open(fname, 'r')
     skip_lines(f,2)
 
-    upper = []
-    lower = []
+    upper = np.array([])
+    lower = np.array([])
     center = find_center(fname, res_name, atom_name)
 
     while True:
@@ -94,9 +91,9 @@ def print_leaflet(fname, res_name, atom_name):
 
         if res == res_name and atom == atom_name:
             if z < center:
-                lower.append(res_num)
+                lower = np.append(lower, res_num)
             else:
-                upper.append(res_num)
+                upper = np.append(upper, res_num)
 
     f.close()
 
